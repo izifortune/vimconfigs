@@ -25,11 +25,11 @@ Plugin 'bling/vim-airline'
 Plugin 'unblevable/quick-scope'
 Plugin 'mattn/emmet-vim'
 Plugin 'ervandew/supertab'
-Plugin 'airblade/vim-gitgutter'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'pangloss/vim-javascript'
 Bundle 'jlanzarotta/bufexplorer'
-
+Plugin 'jwhitley/vim-matchit'
+Plugin 'terryma/vim-multiple-cursors'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -45,8 +45,8 @@ filetype indent on
 
 set autoread
 
-let mapleader = ","
-let g:mapleader = ","
+" let mapleader = ","
+" let g:mapleader = ","
 
 set so=7
 
@@ -361,3 +361,11 @@ hi IndentGuidesOdd  ctermbg=gray
 "markdown
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 
+" Shortcut to rapidly toggle `set list`
+nmap <leader>l :set list!<CR>
+"
+" " Use the same symbols as TextMate for tabstops and EOLs
+set listchars=tab:▸\ ,eol:¬"
+
+"keep indend on paste
+":nnoremap p p`[v`]=`]`
