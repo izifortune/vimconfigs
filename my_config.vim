@@ -1,49 +1,69 @@
-set nocompatible              " be iMproved, required
-filetype off                  " required
-
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
+set nocompatible " No VI compatibility
+set autoread " Detect file changes outside vim
+"
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
-
-" let Vundle manage Vundle, required
-Plugin 'gmarik/Vundle.vim'
+call plug#begin('~/.vim/plugged')
 
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.
 " plugin on GitHub repo
-Plugin 'tpope/vim-fugitive'
-Plugin 'wincent/command-t'
-Plugin 'scrooloose/nerdtree'
-Plugin 'tpope/vim-surround'
-Plugin 'scrooloose/syntastic'
-Plugin 'tpope/vim-commentary'
-Plugin 'jiangmiao/auto-pairs'
-Plugin 'rking/ag.vim'
-Plugin 'bling/vim-airline'
-Plugin 'unblevable/quick-scope'
-Plugin 'mattn/emmet-vim'
-Plugin 'ervandew/supertab'
-Plugin 'nathanaelkane/vim-indent-guides'
-Plugin 'pangloss/vim-javascript'
-Bundle 'jlanzarotta/bufexplorer'
-Plugin 'jwhitley/vim-matchit'
-Plugin 'terryma/vim-multiple-cursors'
+Plug 'chriskempson/base16-vim'
+Plug 'tpope/vim-fugitive'
+"Plug 'wincent/command-t'
+Plug 'ctrlpvim/ctrlp.vim' " Fast file opening
+Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
+Plug 'tpope/vim-surround'
+Plug 'scrooloose/syntastic'
+Plug 'tpope/vim-commentary'
+Plug 'Raimondi/delimitMate' " Auto insert paired characters
+"Plun 'jiangmiao/auto-pairs'
+Plug 'rking/ag.vim'
+Plug 'bling/vim-airline'
+Plug 'unblevable/quick-scope'
+Plug 'ervandew/supertab'
+Plug 'nathanaelkane/vim-indent-guides'
+"Plun 'pangloss/vim-javascript'
+Plug 'jlanzarotta/bufexplorer'
+Plug 'jwhitley/vim-matchit', {'for': 'html'}
+Plug 'terryma/vim-multiple-cursors'
+Plug '0x0dea/vim-molasses'
+Plug 'tpope/vim-repeat' " Repeat last command with .
+Plug 'tpope/vim-unimpaired' " Additional paired mappings
+Plug 'mattn/emmet-vim', { 'for': 'html'  } " Zen coding at it's best"
+Plug 'othree/html5.vim', { 'for': 'html'  }
+Plug 'pangloss/vim-javascript', { 'for': 'javascript'  }
+Plug 'jelera/vim-javascript-syntax', { 'for': 'javascript'  }
+Plug 'groenewege/vim-less', { 'for': 'less'  }
+Plug 'ap/vim-css-color', { 'for': 'css'  }
+Plug 'hail2u/vim-css3-syntax', { 'for': 'css'  }
 
 " All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
+call plug#end()
 
-"BASIC
-set history=700
+set hidden " Some kind of buffer tweak
+set history=1000
+set undolevels=1000
+set title " Set title of the window
+set clipboard=unnamed " Use OS clipboard
+set encoding=utf-8
+set mouse=a
+set backspace=indent,eol,start
+set lazyredraw
+set ttyfast
+set showmatch " Highlight matching pair
+set nobackup " Disable swapfiles
+set nowritebackup
+set noswapfile
+set listchars=eol:¬
+set visualbell " No noise just flash
 
-filetype plugin on
-filetype indent on
-
-set autoread
+" Syntax highlighting
+" ===================
+" filetype on
+" filetype plugin on
+" filetype indent on
+" set t_Co=256"
 
 " let mapleader = ","
 " let g:mapleader = ","
@@ -57,12 +77,7 @@ set cmdheight=2
 
 set hid
 
-if has('mouse')
-	set mouse=a
-endif
-
 set ignorecase
-set smartcase
 set hlsearch
 set incsearch
 set lazyredraw
@@ -79,13 +94,6 @@ set foldcolumn=1
 syntax enable
 
 set background=dark
-
-if has("gui_running")
-	set guioptions-=T
-	set guioptions-=e
-	set t_Co=256
-	set guitablabel=%M\ %t
-endif
 
 set encoding=utf8
 set ffs=unix,dos,mac
@@ -104,6 +112,21 @@ set tw=500
 set ai "Auto indent
 set si "Smart indent
 set nowrap "Wrap lines
+
+
+" Visual tweaks
+" =============
+set number " Display number on the sidebar
+set relativenumber
+set colorcolumn=80
+set nowrap
+set linebreak
+
+"Folding
+" =======
+set foldmethod=indent
+set foldnestmax=3
+set nofoldenable
 
 vnoremap <silent> * :call VisualSelection('f', '')<CR>
 vnoremap <silent> # :call VisualSelection('b', '')<CR>
@@ -287,22 +310,6 @@ endtry
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Parenthesis/bracket
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-vnoremap $1 <esc>`>a)<esc>`<i(<esc>
-vnoremap $2 <esc>`>a]<esc>`<i[<esc>
-vnoremap $3 <esc>`>a}<esc>`<i{<esc>
-vnoremap $$ <esc>`>a"<esc>`<i"<esc>
-vnoremap $q <esc>`>a'<esc>`<i'<esc>
-vnoremap $e <esc>`>a"<esc>`<i"<esc>
-
-" Map auto complete of (, ", ', [
-inoremap $1 ()<esc>i
-inoremap $2 []<esc>i
-inoremap $3 {}<esc>i
-inoremap $4 {<esc>o}<esc>O
-inoremap $q ''<esc>i
-inoremap $e ""<esc>i
-inoremap $t <><esc>i
-
 "backspace
 set backspace=2
 
@@ -315,7 +322,15 @@ map <leader>nf :NERDTreeFind<cr>
 
 
 ""MINE
-colorscheme monokai
+"colorscheme monokai
+" Base16
+" ======
+let g:base16colorspace=256
+
+" Colorscheme
+" ===========
+set background=dark
+colorscheme base16-monokai
 
 "Remove visual delay
 set timeoutlen=1000 ttimeoutlen=0
@@ -338,22 +353,15 @@ let g:syntastic_javascript_checkers = ['jshint', 'jscs']
 
 
 "command-t
-let g:CommandTWildIgnore=&wildignore . ",**/bower_components/*" . ",**/node_modules/*" . ",**/vendor/*" . ",**/dist/*" . ",**/build/*" . ",**reports/*"
-let g:CommandTCancelMap=['<ESC>','<C-c>']
-let g:CommandTMaxHeight=10
+let g:ctrlp_custom_ignore = '\v[\/](node_modules|target|dist|vendor|bower_components|build|reports)|(\.(swp|ico|git|svn))$'
 
 map <leader>ff :Ag 
 set pastetoggle=<leader>p
-set number
 set expandtab
 set shiftwidth=2
 set softtabstop=2
 map <leader>ch :lclose<CR>
 map <leader>oh :lopen<CR>
-
-"emmet
-let g:user_emmet_install_global = 0
-autocmd FileType html,css EmmetInstall
 
 "Indent guide
 hi IndentGuidesOdd  ctermbg=gray
