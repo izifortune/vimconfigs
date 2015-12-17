@@ -12,7 +12,7 @@ Plug 'chriskempson/base16-vim'
 Plug 'tpope/vim-fugitive'
 "Plug 'wincent/command-t'
 Plug 'ctrlpvim/ctrlp.vim' " Fast file opening
-Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
+Plug 'scrooloose/nerdtree'
 Plug 'tpope/vim-surround'
 Plug 'scrooloose/syntastic'
 Plug 'tpope/vim-commentary'
@@ -27,7 +27,7 @@ Plug 'nathanaelkane/vim-indent-guides'
 Plug 'jlanzarotta/bufexplorer'
 Plug 'jwhitley/vim-matchit', {'for': 'html'}
 Plug 'terryma/vim-multiple-cursors'
-Plug '0x0dea/vim-molasses'
+"Plug '0x0dea/vim-molasses'
 Plug 'tpope/vim-repeat' " Repeat last command with .
 Plug 'tpope/vim-unimpaired' " Additional paired mappings
 Plug 'mattn/emmet-vim', { 'for': 'html'  } " Zen coding at it's best"
@@ -37,6 +37,10 @@ Plug 'jelera/vim-javascript-syntax', { 'for': 'javascript'  }
 Plug 'groenewege/vim-less', { 'for': 'less'  }
 Plug 'ap/vim-css-color', { 'for': 'css'  }
 Plug 'hail2u/vim-css3-syntax', { 'for': 'css'  }
+Plug 'https://github.com/gorodinskiy/vim-coloresque.git'
+Plug 'xolox/vim-misc'
+Plug 'xolox/vim-notes'
+Plug 'sickill/vim-monokai'
 
 " All of your Plugins must be added before the following line
 call plug#end()
@@ -325,12 +329,12 @@ map <leader>nf :NERDTreeFind<cr>
 "colorscheme monokai
 " Base16
 " ======
-let g:base16colorspace=256
+"let g:base16colorspace=256
 
 " Colorscheme
 " ===========
 set background=dark
-colorscheme base16-monokai
+colorscheme monokai
 
 "Remove visual delay
 set timeoutlen=1000 ttimeoutlen=0
@@ -349,6 +353,7 @@ let g:syntastic_aggregate_errors = 1
 
 "syntastic ignore
 let g:syntastic_html_checkers=['']
+let g:syntastic_less_checkers=['']
 let g:syntastic_javascript_checkers = ['jshint', 'jscs']
 
 
@@ -362,6 +367,21 @@ set shiftwidth=2
 set softtabstop=2
 map <leader>ch :lclose<CR>
 map <leader>oh :lopen<CR>
+nnoremap <leader>gs :Gstatus<CR>
+nnoremap <leader>gc :Gcommit -v -q<CR>
+nnoremap <leader>ga :Gcommit --amend<CR>
+nnoremap <leader>gt :Gcommit -v -q %<CR>
+nnoremap <leader>gd :Gdiff<CR>
+nnoremap <leader>ge :Gedit<CR>
+nnoremap <leader>gr :Gread<CR>
+nnoremap <leader>gw :Gwrite<CR><CR>
+nnoremap <leader>gl :silent! Glog<CR>
+nnoremap <leader>gp :Ggrep<Space>
+nnoremap <leader>gm :Gmove<Space>
+nnoremap <leader>gb :Git branch<Space>
+nnoremap <leader>go :Git checkout<Space>
+nnoremap <leader>gps :Dispatch! git push<CR>
+nnoremap <leader>gpl :Dispatch! git pull<CR>
 
 "Indent guide
 hi IndentGuidesOdd  ctermbg=gray
@@ -377,3 +397,64 @@ set listchars=tab:▸\ ,eol:¬"
 
 "keep indend on paste
 ":nnoremap p p`[v`]=`]`
+"
+:let g:notes_directories = ['~/Documents/Notes']
+:set diffopt+=vertical
+
+" Enable the list of buffers
+" let g:airline#extensions#tabline#enabled = 1
+"
+" " Show just the filename
+" let g:airline#extensions#tabline#fnamemod = ':t'
+nmap <leader>cs :let @*=expand("%")<CR>
+nmap <leader>cl :let @*=expand("%:p")<CR>)
+
+let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
+nnoremap <leader>sc :SyntasticCheck<CR>
+set autoread
+
+" Rename tabs to show tab number.
+" (Based on http://stackoverflow.com/questions/5927952/whats-implementation-of-vims-default-tabline-function)
+if exists("+showtabline")
+    function! MyTabLine()
+        let s = ''
+        let wn = ''
+        let t = tabpagenr()
+        let i = 1
+        while i <= tabpagenr('$')
+            let buflist = tabpagebuflist(i)
+            let winnr = tabpagewinnr(i)
+            let s .= '%' . i . 'T'
+            let s .= (i == t ? '%1*' : '%2*')
+            let s .= ' '
+            let wn = tabpagewinnr(i,'$')
+
+            let s .= '%#TabNum#'
+            let s .= i
+            " let s .= '%*'
+            let s .= (i == t ? '%#TabLineSel#' : '%#TabLine#')
+            let bufnr = buflist[winnr - 1]
+            let file = bufname(bufnr)
+            let buftype = getbufvar(bufnr, 'buftype')
+            if buftype == 'nofile'
+                if file =~ '\/.'
+                    let file = substitute(file, '.*\/\ze.', '', '')
+                endif
+            else
+                let file = fnamemodify(file, ':p:t')
+            endif
+            if file == ''
+                let file = '[No Name]'
+            endif
+            let s .= ' ' . file . ' '
+            let i = i + 1
+        endwhile
+        let s .= '%T%#TabLineFill#%='
+        let s .= (tabpagenr('$') > 1 ? '%999XX' : 'X')
+        return s
+    endfunction
+    set stal=2
+    set tabline=%!MyTabLine()
+    set showtabline=1
+    highlight link TabNum Special
+endif
