@@ -20,12 +20,12 @@ Plug 'Raimondi/delimitMate' " Auto insert paired characters
 "Plun 'jiangmiao/auto-pairs'
 Plug 'rking/ag.vim'
 Plug 'bling/vim-airline'
-Plug 'unblevable/quick-scope'
+"Plug 'unblevable/quick-scope'
 Plug 'ervandew/supertab'
 Plug 'nathanaelkane/vim-indent-guides'
 "Plun 'pangloss/vim-javascript'
 Plug 'jlanzarotta/bufexplorer'
-Plug 'jwhitley/vim-matchit', {'for': 'html'}
+" Plug 'jwhitley/vim-matchit', {'for': 'html'}
 Plug 'terryma/vim-multiple-cursors'
 "Plug '0x0dea/vim-molasses'
 Plug 'tpope/vim-repeat' " Repeat last command with .
@@ -37,10 +37,19 @@ Plug 'jelera/vim-javascript-syntax', { 'for': 'javascript'  }
 Plug 'groenewege/vim-less', { 'for': 'less'  }
 Plug 'ap/vim-css-color', { 'for': 'css'  }
 Plug 'hail2u/vim-css3-syntax', { 'for': 'css'  }
-Plug 'https://github.com/gorodinskiy/vim-coloresque.git'
+"Plug 'https://github.com/gorodinskiy/vim-coloresque.git'
 Plug 'xolox/vim-misc'
 Plug 'xolox/vim-notes'
 Plug 'sickill/vim-monokai'
+Plug 'ConradIrwin/vim-bracketed-paste'
+Plug 'nanotech/jellybeans.vim'
+Plug 'tomasr/molokai'
+Plug 'groenewege/vim-less'
+Plug 'itchyny/calendar.vim'
+Plug 'easymotion/vim-easymotion'
+Plug 'sjl/gundo.vim'
+Plug 'Valloric/YouCompleteMe'
+Plug 'skwp/greplace.vim'
 
 " All of your Plugins must be added before the following line
 call plug#end()
@@ -397,6 +406,8 @@ set listchars=tab:▸\ ,eol:¬"
 
 "keep indend on paste
 ":nnoremap p p`[v`]=`]`
+:nnoremap <c-p> p
+:nnoremap p p=`]
 "
 :let g:notes_directories = ['~/Documents/Notes']
 :set diffopt+=vertical
@@ -458,3 +469,99 @@ if exists("+showtabline")
     set showtabline=1
     highlight link TabNum Special
 endif
+
+"Saner command line history
+cnoremap <c-n>  <down>
+cnoremap <c-p>  <up>
+
+"Don't lose selection
+xnoremap <  <gv
+xnoremap >  >gv
+
+colorscheme jellybeans
+
+let g:calendar_google_calendar = 1
+let g:calendar_google_task = 1
+
+if !exists('g:loaded_matchit')
+  runtime macros/matchit.vim
+endif
+
+nnoremap <F6> :GundoToggle<CR>
+nmap <silent> <c-w>> :vertical resize +10<CR>
+nmap <silent> <c-w>< :vertical resize -10<CR>
+
+:set wrap
+:set linebreak
+:set nolist  " list disables linebreak
+:set textwidth=0
+:set wrapmargin=0
+
+
+" .vim/plugin/qfdo.vim
+" Run a command on each line in the Quickfix buffer.
+" Qfdo! uses the location list instead.
+" Author: Christian Brabandt
+" Author: Douglas
+" See: http://vim.1045645.n5.nabble.com/execute-command-in-vim-grep-results-td3236900.html
+" See: http://efiquest.org/2009-02-19/32/
+" Usage:
+"     :Qfdo s#this#that#
+"     :Qfdo! s#this#that#
+"     :Qfdofile %s#this#that#
+"     :Qfdofile! %s#this#that#
+
+" Christian Brabandt runs the command on each *file*
+" I have mapped Qfdo to line-by-line below
+function! QFDo(bang, command)
+  let qflist={}
+  if a:bang
+    let tlist=map(getloclist(0), 'get(v:val, ''bufnr'')')
+  else
+    let tlist=map(getqflist(), 'get(v:val, ''bufnr'')')
+  endif
+  if empty(tlist)
+    echomsg "Empty Quickfixlist. Aborting"
+    return
+  endif
+  for nr in tlist
+    let item=fnameescape(bufname(nr))
+    if !get(qflist, item,0)
+      let qflist[item]=1
+    endif
+  endfor
+  execute 'argl ' .join(keys(qflist))
+  execute 'argdo ' . a:command
+endfunction
+
+" Run the command on each *line* in the Quickfix buffer (or location list)
+" My own crack at it, based on Pavel Shevaev on efiquest
+function! QFDo_each_line(bang, command)
+  try
+    if a:bang
+      silent lrewind
+    else
+      silent crewind
+    endif
+    while 1
+      echo bufname("%") line(".")
+      execute a:command
+      if a:bang
+        silent lnext
+      else
+        silent cnext
+      endif
+    endwhile
+  catch /^Vim\%((\a\+)\)\=:E\%(553\|42\):/
+  endtry
+endfunction
+
+command! -nargs=1 -bang Qfdo :call QFDo_each_line(<bang>0,<q-args>)
+command! -nargs=1 -bang Qfdofile :call QFDo(<bang>0,<q-args>)
+
+map <leader>sr :Qfdo
+
+set grepprg=ag
+
+let g:grep_cmd_opts = '--line-numbers --noheading'
+"":%!python -m json.tool
